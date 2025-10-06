@@ -236,7 +236,10 @@ class HubConnection {
       _resetTimeoutPeriod();
       _resetKeepAliveInterval();
 
-      await _handshakeCompleter!.future;
+      // Can be null due to race condition between await _sendMessage and .onRecieve for Long Polling.
+      if (_handshakeCompleter != null) {
+        await _handshakeCompleter!.future;
+      }
 
       // It's important to check the stopDuringStartError instead of just relying on the handshakePromise
       // being rejected on close, because this continuation can run after both the handshake completed successfully
